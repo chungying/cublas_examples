@@ -15,4 +15,4 @@ static __inline__ void dotProdoct (
   cublasSdot(handle, array_size, x, 1, y, 1, result);
 }
 
-static void 
+//static void 

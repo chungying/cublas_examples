@@ -9,6 +9,23 @@
 #define N 5
 #define IDX2C(i,j,ld) (((j)*(ld))+(i))
 
+__global__ void printFromKernel()
+{
+  printf("print from kernel\n");
+}
+
+__global__ void printResult(float* m)
+{
+  printf("modified devPtrA\n");
+  for (int j = 0; j < N; j++) {
+      for (int i = 0; i < M; i++) {
+          printf ("%7.0f", m[IDX2C(i,j,M)]);
+      }
+      printf ("\n");
+  }
+  
+}
+
 static __inline__ void modify (
   cublasHandle_t handle,//status
   float *m,//device array pointer 
@@ -19,8 +36,8 @@ static __inline__ void modify (
   float alpha,//scalar
   float beta)//scalar
 {
-    cublasSscal (handle, n-p, &alpha, &m[IDX2C(p,q,ldm)], ldm);
-    cublasSscal (handle, ldm-p, &beta, &m[IDX2C(p,q,ldm)], 1);
+  cublasSscal (handle, n-p, &alpha, &m[IDX2C(p,q,ldm)], ldm);
+  cublasSscal (handle, ldm-p, &beta, &m[IDX2C(p,q,ldm)], 1);
 }
 
 int main (void){
@@ -35,10 +52,13 @@ int main (void){
         printf ("host memory allocation failed");
         return EXIT_FAILURE;
     }
+    //printf("original a\n");
     for (j = 0; j < N; j++) {
         for (i = 0; i < M; i++) {
             a[IDX2C(i,j,M)] = (float)(i * M + j + 1);
+            //printf ("%7.0f", a[IDX2C(i,j,M)]);
         }
+        //printf ("\n");
     }
     cudaStat = cudaMalloc ((void**)&devPtrA, M*N*sizeof(*a));
     if (cudaStat != cudaSuccess) {
@@ -57,7 +77,12 @@ int main (void){
         cublasDestroy(handle);
         return EXIT_FAILURE;
     }
+    //printResult<<<1,1>>>(devPtrA);
+    //cudaDeviceSynchronize();
+    printFromKernel<<<2,2>>>();
+    cudaDeviceSynchronize();
     modify (handle, devPtrA, M, N, 1, 2, 16.0f, 12.0f);
+
     stat = cublasGetMatrix (M, N, sizeof(*a), devPtrA, M, a, M);
     if (stat != CUBLAS_STATUS_SUCCESS) {
         printf ("data upload failed");
@@ -67,6 +92,7 @@ int main (void){
     }
     cudaFree (devPtrA);
     cublasDestroy(handle);
+    printf("modified a\n");
     for (j = 0; j < N; j++) {
         for (i = 0; i < M; i++) {
             printf ("%7.0f", a[IDX2C(i,j,M)]);
