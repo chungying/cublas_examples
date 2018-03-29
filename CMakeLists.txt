@@ -9,13 +9,18 @@ add_compile_options(-std=c++11)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED)
 find_package(CUDA 8.0 )
-#SET (CUDA_VERBOSE_BUILD ON CACHE BOOL "nvcc verbose" FORCE)
 MESSAGE(STATUS "CUDA_FOUND is ${CUDA_FOUND}")
 MESSAGE(STATUS "CUDA_VERSION_STRING is ${CUDA_VERSION_STRING}")
 MESSAGE(STATUS "CUDA_TOOLKIT_ROOT_DIR is ${CUDA_TOOLKIT_ROOT_DIR}")
 MESSAGE(STATUS "CUDA_INCLUDE_DIRS is ${CUDA_INCLUDE_DIRS}")
 MESSAGE(STATUS "CUDA_LIBRARIES is ${CUDA_LIBRARIES}")
 MESSAGE(STATUS "CUDA_CUBLAS_LIBRARIES is ${CUDA_CUBLAS_LIBRARIES}")
+MESSAGE(STATUS "CUDA_VERBOSE_BUILD is ${CUDA_VERBOSE_BUILD}")
+SET (CUDA_VERBOSE_BUILD OFF CACHE BOOL "nvcc verbose" FORCE)
+MESSAGE(STATUS "CUDA_VERBOSE_BUILD is ${CUDA_VERBOSE_BUILD}")
+MESSAGE(STATUS "CUDA_NVCC_FLAGS is ${CUDA_NVCC_FLAGS}")
+SET (CUDA_NVCC_FLAGS -dlink;-x;cu )
+MESSAGE(STATUS "CUDA_NVCC_FLAGS is ${CUDA_NVCC_FLAGS}")
 
 ###################################
 ## catkin specific configuration ##
@@ -28,9 +33,9 @@ MESSAGE(STATUS "CUDA_CUBLAS_LIBRARIES is ${CUDA_CUBLAS_LIBRARIES}")
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES markov_cuda
-  CATKIN_DEPENDS CUDA
-  DEPENDS CUDA
+  #LIBRARIES markov_cuda
+  #CATKIN_DEPENDS CUDA
+  #DEPENDS CUDA
 )
 
 ###########
@@ -43,22 +48,23 @@ include_directories(
   ${CUDA_INCLUDE_DIRS}
 )
 
-cuda_add_library(markov_cuda
-  src/hello.cu
-)
+#cuda_add_library(markov_cuda
+#)
+#CUDA_LINK_SEPARABLE_COMPILATION_OBJECTS()
 
 add_executable(main
   src/main.cpp
+  src/hello.cpp
 )
 
-target_link_libraries(markov_cuda
-  ${catkin_LIBRARIES}
-  ${CUDA_LIBRARIES}
-  ${CUDA_CUBLAS_LIBRARIES}
-)
+#target_link_libraries(markov_cuda
+#  ${catkin_LIBRARIES}
+#  ${CUDA_LIBRARIES}
+#  ${CUDA_CUBLAS_LIBRARIES}
+#)
 target_link_libraries(main
   ${catkin_LIBRARIES}
-  markov_cuda
+  #markov_cuda
 )
 
 cuda_add_executable(cublas_examples_1
@@ -85,7 +91,7 @@ target_link_libraries(cublas_examples_1
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS main cublas_examples_1 markov_cuda
+install(TARGETS main cublas_examples_1
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
