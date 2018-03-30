@@ -9,6 +9,8 @@ add_compile_options(-std=c++11)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED)
 find_package(CUDA 8.0 )
+SET (CUDA_ENABLE ON CACHE BOOL "enable NVCC compiler")
+message(STATUS "CUDA_ENABLE is ${CUDA_ENABLE}")
 MESSAGE(STATUS "CUDA_FOUND is ${CUDA_FOUND}")
 MESSAGE(STATUS "CUDA_VERSION_STRING is ${CUDA_VERSION_STRING}")
 MESSAGE(STATUS "CUDA_TOOLKIT_ROOT_DIR is ${CUDA_TOOLKIT_ROOT_DIR}")
@@ -17,9 +19,14 @@ MESSAGE(STATUS "CUDA_LIBRARIES is ${CUDA_LIBRARIES}")
 MESSAGE(STATUS "CUDA_CUBLAS_LIBRARIES is ${CUDA_CUBLAS_LIBRARIES}")
 MESSAGE(STATUS "CUDA_VERBOSE_BUILD is ${CUDA_VERBOSE_BUILD}")
 SET (CUDA_VERBOSE_BUILD OFF CACHE BOOL "nvcc verbose" FORCE)
+SET (CUDA_NVCC_FLAGS -Wno-deprecated-gpu-targets CACHE STRING "suppress deprecated warnings" FORCE)
 MESSAGE(STATUS "CUDA_VERBOSE_BUILD is ${CUDA_VERBOSE_BUILD}")
 MESSAGE(STATUS "CUDA_NVCC_HOST_COMPILER is ${CUDA_NVCC_HOST_COMPILER}")
 MESSAGE(STATUS "CUDA_PROPAGATE_HOST_FLAGS is ${CUDA_PROPAGATE_HOST_FLAGS}")
+#find_package(Eigen REQUIRED)
+#message(STATUS "Found eigen3:")
+#message(STATUS "  include: ${EIGEN_INCLUDE_DIRS}")
+#message(STATUS "  definitions: ${EIGEN_DEFINITIONS}")
 
 ###################################
 ## catkin specific configuration ##
@@ -40,27 +47,35 @@ catkin_package(
 ###########
 ## Build ##
 ###########
-
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
   ${CUDA_INCLUDE_DIRS}
 )
 
-cuda_add_library(hello_world_cuda
-  src/cuda_example/hello_world.cu
-)
-target_link_libraries(hello_world_cuda
-  ${catkin_LIBRARIES}
-  ${CUDA_LIBRARIES}
-  ${CUDA_CUBLAS_LIBRARIES}
-)
+if(${CUDA_FOUND} AND ${CUDA_ENABLE})
+  add_definitions(-DCUDA_ENABLE)
+  SET(HELLO_WORLD_CUDA hello_world_cuda)
+  cuda_add_library(${HELLO_WORLD_CUDA}
+    src/cuda_example/hello_world.cu
+  )
+  target_link_libraries(${HELLO_WORLD_CUDA}
+    ${catkin_LIBRARIES}
+    ${CUDA_LIBRARIES}
+    ${CUDA_CUBLAS_LIBRARIES}
+  )
+else(${CUDA_FOUND} AND ${CUDA_ENABLE})
+  SET(HELLO_WORLD_CUDA "")
+endif(${CUDA_FOUND} AND ${CUDA_ENABLE})
+
+message(STATUS "HELLO_WORLD_CUDA is ${HELLO_WORLD_CUDA}")
 
 add_library(hello_world
   src/cuda_example/hello_world.cpp
 )
 target_link_libraries(hello_world
   ${catkin_LIBRARIES}
+  ${HELLO_WORLD_CUDA}
 )
 
 add_executable(cuda_example
@@ -69,7 +84,6 @@ add_executable(cuda_example
 target_link_libraries(cuda_example
   ${catkin_LIBRARIES}
   hello_world
-  hello_world_cuda
 )
 
 cuda_add_executable(cublas_example

@@ -3,14 +3,15 @@
 __global__
 void hello(char *a, int *b)
 {
-    a[threadIdx.x] += b[threadIdx.x];
+  //a[threadIdx.x] += b[threadIdx.x];
+  a[threadIdx.x] = sharedFunction(a[threadIdx.x], b[threadIdx.x]);
+
 }
 
-int testmain()
+int testmainCUDA()
 {
   char a[N] = "Hello ";
-  int b[N] = {15, 10, 6, 0, -11, 1, 0};
-  
+  int b[N] = {15, 10, 6, 0, -11, 1, 0}; 
   char *ad;
   int *bd;
   const int csize = N*sizeof(char);
@@ -19,13 +20,13 @@ int testmain()
   printf("%s", a);
   
   if ( cudaSuccess != cudaMalloc( (void**)&ad, csize ) )
-    printf( "cannot allocate device memory to ad");
+    printf( "cannot allocate device memory to ad\n");
   if ( cudaSuccess != cudaMalloc( (void**)&bd, isize ) )
-    printf( "cannot allocate device memory to bd");
+    printf( "cannot allocate device memory to bd\n");
   if ( cudaSuccess != cudaMemcpy( ad, a, csize, cudaMemcpyHostToDevice ) )
-    printf( "cannot copy memory to devide");
+    printf( "cannot copy memory to device\n");
   if ( cudaSuccess != cudaMemcpy( bd, b, isize, cudaMemcpyHostToDevice ) )
-    printf( "cannot copy memory to devide");
+    printf( "cannot copy memory to device\n");
   
   dim3 dimBlock( blocksize, 1 );
   dim3 dimGrid( 1, 1 );
@@ -41,6 +42,6 @@ int testmain()
   cudaMemcpy( a, ad, csize, cudaMemcpyDeviceToHost );
   cudaFree( ad );
   
-  printf("%s\n", a);
+  printf("%s from CUDA\n", a);
   return EXIT_SUCCESS;
 }

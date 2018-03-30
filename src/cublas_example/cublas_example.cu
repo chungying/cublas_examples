@@ -32,7 +32,7 @@ int main (void){
     float* a = 0;
     a = (float *)malloc (M * N * sizeof (*a));
     if (!a) {
-        printf ("host memory allocation failed");
+        printf ("host memory allocation failed\n");
         return EXIT_FAILURE;
     }
     //printf("original a\n");
@@ -45,7 +45,7 @@ int main (void){
     }
     cudaStat = cudaMalloc ((void**)&devPtrA, M*N*sizeof(*a));
     if (cudaStat != cudaSuccess) {
-        printf ("device memory allocation failed");
+        printf ("device memory allocation failed\n");
         return EXIT_FAILURE;
     }
     stat = cublasCreate(&handle);
@@ -55,7 +55,7 @@ int main (void){
     }
     stat = cublasSetMatrix (M, N, sizeof(*a), a, M, devPtrA, M);
     if (stat != CUBLAS_STATUS_SUCCESS) {
-        printf ("data download failed");
+        printf ("data download failed\n");
         cudaFree (devPtrA);
         cublasDestroy(handle);
         return EXIT_FAILURE;
@@ -64,7 +64,7 @@ int main (void){
 
     stat = cublasGetMatrix (M, N, sizeof(*a), devPtrA, M, a, M);
     if (stat != CUBLAS_STATUS_SUCCESS) {
-        printf ("data upload failed");
+        printf ("data upload failed\n");
         cudaFree (devPtrA);
         cublasDestroy(handle);
         return EXIT_FAILURE;
