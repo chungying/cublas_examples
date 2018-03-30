@@ -1,4 +1,4 @@
-#include "hello.h"
+#include "hello_world/hello_world.h"
 
 __global__
 void hello(char *a, int *b)

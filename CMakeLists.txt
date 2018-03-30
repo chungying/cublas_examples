@@ -18,9 +18,6 @@ MESSAGE(STATUS "CUDA_CUBLAS_LIBRARIES is ${CUDA_CUBLAS_LIBRARIES}")
 MESSAGE(STATUS "CUDA_VERBOSE_BUILD is ${CUDA_VERBOSE_BUILD}")
 SET (CUDA_VERBOSE_BUILD OFF CACHE BOOL "nvcc verbose" FORCE)
 MESSAGE(STATUS "CUDA_VERBOSE_BUILD is ${CUDA_VERBOSE_BUILD}")
-MESSAGE(STATUS "CUDA_NVCC_FLAGS is ${CUDA_NVCC_FLAGS}")
-#SET (CUDA_NVCC_FLAGS "-dlink -x cu" )
-MESSAGE(STATUS "CUDA_NVCC_FLAGS is ${CUDA_NVCC_FLAGS}")
 MESSAGE(STATUS "CUDA_NVCC_HOST_COMPILER is ${CUDA_NVCC_HOST_COMPILER}")
 MESSAGE(STATUS "CUDA_PROPAGATE_HOST_FLAGS is ${CUDA_PROPAGATE_HOST_FLAGS}")
 
@@ -50,35 +47,35 @@ include_directories(
   ${CUDA_INCLUDE_DIRS}
 )
 
-cuda_add_library(markov_cuda
-  src/hello.cu
+cuda_add_library(hello_world_cuda
+  src/cuda_example/hello_world.cu
 )
-target_link_libraries(markov_cuda
+target_link_libraries(hello_world_cuda
   ${catkin_LIBRARIES}
   ${CUDA_LIBRARIES}
   ${CUDA_CUBLAS_LIBRARIES}
 )
 
-add_library(markov
-  src/hello.cpp
+add_library(hello_world
+  src/cuda_example/hello_world.cpp
 )
-target_link_libraries(markov
+target_link_libraries(hello_world
   ${catkin_LIBRARIES}
 )
 
-add_executable(main
-  src/main.cpp
+add_executable(cuda_example
+  src/cuda_example/cuda_example.cpp
 )
-target_link_libraries(main
+target_link_libraries(cuda_example
   ${catkin_LIBRARIES}
-  markov
-  markov_cuda
+  hello_world
+  hello_world_cuda
 )
 
-cuda_add_executable(cublas_examples_1
-  src/cublas_examples_1.cu
+cuda_add_executable(cublas_example
+  src/cublas_example/cublas_example.cu
 )
-target_link_libraries(cublas_examples_1
+target_link_libraries(cublas_example
   ${catkin_LIBRARIES}
   ${CUDA_LIBRARIES}
   ${CUDA_CUBLAS_LIBRARIES}
@@ -99,14 +96,14 @@ target_link_libraries(cublas_examples_1
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS main cublas_examples_1
+install(TARGETS cuda_example cublas_example
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 ## Mark cpp header files for installation
-install(DIRECTORY include/markov_cuda
+install(DIRECTORY include
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.h"
   PATTERN ".svn" EXCLUDE
