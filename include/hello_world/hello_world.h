@@ -8,7 +8,6 @@
 #define __CUDA_DEVICE__ 
 #define __CUDA_HOST_DEVICE__ 
 #define __CUDA_GLOBAL__ 
-
 #endif
 
 #include <stdio.h>

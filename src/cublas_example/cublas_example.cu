@@ -19,7 +19,8 @@ static __inline__ void modify (
   float alpha,//scalar
   float beta)//scalar
 {
-  cublasSscal (handle, n-p, &alpha, &m[IDX2C(p,q,ldm)], ldm);
+  printf ("element_size: %d, scalar: %f, strid: %d\n", n-p, alpha, ldm);
+  cublasSscal (handle, n-q, &alpha, &m[IDX2C(p,q,ldm)], ldm);
   cublasSscal (handle, ldm-p, &beta, &m[IDX2C(p,q,ldm)], 1);
 }
 
@@ -35,13 +36,20 @@ int main (void){
         printf ("host memory allocation failed\n");
         return EXIT_FAILURE;
     }
-    //printf("original a\n");
     for (j = 0; j < N; j++) {
         for (i = 0; i < M; i++) {
-            a[IDX2C(i,j,M)] = (float)(i * M + j + 1);
+            //a[IDX2C(i,j,M)] = (float)(i * N + j + 1);
+            a[IDX2C(i,j,M)] = (float)(IDX2C(i,j,M));
             //printf ("%7.0f", a[IDX2C(i,j,M)]);
         }
         //printf ("\n");
+    }
+    printf("original a\n");
+    for (i = 0 ; i < N*M ; i++)
+    {
+      printf("%7.0f", a[i]);
+      if(i%M==M-1)
+        printf("\n");
     }
     cudaStat = cudaMalloc ((void**)&devPtrA, M*N*sizeof(*a));
     if (cudaStat != cudaSuccess) {
