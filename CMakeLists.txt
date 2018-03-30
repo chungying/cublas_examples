@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(cublas_examples LANGUAGES CXX)
+project(cublas_examples)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
@@ -19,8 +19,10 @@ MESSAGE(STATUS "CUDA_VERBOSE_BUILD is ${CUDA_VERBOSE_BUILD}")
 SET (CUDA_VERBOSE_BUILD OFF CACHE BOOL "nvcc verbose" FORCE)
 MESSAGE(STATUS "CUDA_VERBOSE_BUILD is ${CUDA_VERBOSE_BUILD}")
 MESSAGE(STATUS "CUDA_NVCC_FLAGS is ${CUDA_NVCC_FLAGS}")
-SET (CUDA_NVCC_FLAGS -dlink;-x;cu )
+#SET (CUDA_NVCC_FLAGS "-dlink -x cu" )
 MESSAGE(STATUS "CUDA_NVCC_FLAGS is ${CUDA_NVCC_FLAGS}")
+MESSAGE(STATUS "CUDA_NVCC_HOST_COMPILER is ${CUDA_NVCC_HOST_COMPILER}")
+MESSAGE(STATUS "CUDA_PROPAGATE_HOST_FLAGS is ${CUDA_PROPAGATE_HOST_FLAGS}")
 
 ###################################
 ## catkin specific configuration ##
@@ -48,23 +50,29 @@ include_directories(
   ${CUDA_INCLUDE_DIRS}
 )
 
-#cuda_add_library(markov_cuda
-#)
-#CUDA_LINK_SEPARABLE_COMPILATION_OBJECTS()
+cuda_add_library(markov_cuda
+  src/hello.cu
+)
+target_link_libraries(markov_cuda
+  ${catkin_LIBRARIES}
+  ${CUDA_LIBRARIES}
+  ${CUDA_CUBLAS_LIBRARIES}
+)
+
+add_library(markov
+  src/hello.cpp
+)
+target_link_libraries(markov
+  ${catkin_LIBRARIES}
+)
 
 add_executable(main
   src/main.cpp
-  src/hello.cpp
 )
-
-#target_link_libraries(markov_cuda
-#  ${catkin_LIBRARIES}
-#  ${CUDA_LIBRARIES}
-#  ${CUDA_CUBLAS_LIBRARIES}
-#)
 target_link_libraries(main
   ${catkin_LIBRARIES}
-  #markov_cuda
+  markov
+  markov_cuda
 )
 
 cuda_add_executable(cublas_examples_1

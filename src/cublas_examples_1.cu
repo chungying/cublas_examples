@@ -9,23 +9,6 @@
 #define N 5
 #define IDX2C(i,j,ld) (((j)*(ld))+(i))
 
-__global__ void printFromKernel()
-{
-  printf("print from kernel\n");
-}
-
-__global__ void printResult(float* m)
-{
-  printf("modified devPtrA\n");
-  for (int j = 0; j < N; j++) {
-      for (int i = 0; i < M; i++) {
-          printf ("%7.0f", m[IDX2C(i,j,M)]);
-      }
-      printf ("\n");
-  }
-  
-}
-
 static __inline__ void modify (
   cublasHandle_t handle,//status
   float *m,//device array pointer 
@@ -77,10 +60,6 @@ int main (void){
         cublasDestroy(handle);
         return EXIT_FAILURE;
     }
-    //printResult<<<1,1>>>(devPtrA);
-    //cudaDeviceSynchronize();
-    printFromKernel<<<2,2>>>();
-    cudaDeviceSynchronize();
     modify (handle, devPtrA, M, N, 1, 2, 16.0f, 12.0f);
 
     stat = cublasGetMatrix (M, N, sizeof(*a), devPtrA, M, a, M);

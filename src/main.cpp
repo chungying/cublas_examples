@@ -1,5 +1,4 @@
-int testmain();
-
+#include "hello.h"
 int main()
 {
   testmain();
