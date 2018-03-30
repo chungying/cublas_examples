@@ -45,3 +45,4 @@ int testmainCUDA()
   printf("%s from CUDA\n", a);
   return EXIT_SUCCESS;
 }
+#include "hello_world.cpp"

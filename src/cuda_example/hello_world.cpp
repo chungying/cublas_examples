@@ -15,7 +15,7 @@ int testmainCPU()
 }
 
 __CUDA_HOST_DEVICE__
-char sharedFunction(const char a, const int b)
+char sharedFunction(char a, int b)
 {
   return a+b;
 }

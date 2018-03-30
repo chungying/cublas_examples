@@ -1,3 +1,4 @@
+#pragma once
 #if defined(CUDA_ENABLE)
 #define __CUDA_DEVICE__ __device__
 #define __CUDA_HOST_DEVICE__ __host__ __device__
@@ -20,8 +21,7 @@
 const int N = 7;
 const int blocksize = 7;
 
-__CUDA_HOST_DEVICE__
-char sharedFunction(const char a, const int b);
+__CUDA_HOST_DEVICE__ char sharedFunction(char a, int b);
 
 int testmainCPU();
 
