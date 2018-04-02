@@ -95,6 +95,15 @@ target_link_libraries(cublas_example
   ${CUDA_CUBLAS_LIBRARIES}
 )
 
+cuda_add_executable(dot
+  src/cublas_example/dot.cu
+)
+target_link_libraries(dot
+  ${catkin_LIBRARIES}
+  ${CUDA_LIBRARIES}
+  ${CUDA_CUBLAS_LIBRARIES}
+)
+
 #############
 ## Install ##
 #############
